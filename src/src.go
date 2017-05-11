@@ -8,14 +8,13 @@ import (
 	"math/rand"
 	"net/http"
 	"text/template"
+	"time"
 
 	"golang.org/x/text/encoding/japanese"
 	"golang.org/x/text/transform"
 
 	"github.com/PuerkitoBio/goquery"
 )
-
-// TODO: add Getter to have interval time for server request.
 
 var targetURLTmpl = template.Must(template.New("targetURL").Parse(
 	`http://www.fe-siken.com/kakomon/{{.Year}}_{{.Season}}/q{{.No}}.html`))
@@ -109,16 +108,62 @@ type Response struct {
 	URL string // source URL
 }
 
+var defaultGetter = NewGetter(LeastIntervalTime)
+
+// the minimum time for request interval.
+const LeastIntervalTime = 5 * time.Second
+
+// Getter is a interface for F.E. question and answer from webpage.
+// serial requests are splited by some interval time so that
+// the number of accessing the outer server is reduced.
+type Getter struct {
+	intervalTime time.Duration
+	lastRequest  time.Time
+}
+
+// return new Getter with intervalTime for server request.
+func NewGetter(intervalTime time.Duration) *Getter {
+	if intervalTime < LeastIntervalTime {
+		panic("intervalTime must be > " + LeastIntervalTime.String())
+	}
+	return &Getter{intervalTime: intervalTime, lastRequest: time.Time{}}
+}
+
+func (g *Getter) wait() {
+	if wait := g.intervalTime - time.Since(g.lastRequest); wait > 0 {
+		time.Sleep(wait)
+	}
+	g.lastRequest = time.Now()
+}
+
+// Get() returns a response, which contains F.E question and its answer selected by Query, from website.
+// This process takes some time. You can cancel it by canceling context.
+//
+// The interval wait time is inserted between serial calling of this method.
+func (g *Getter) Get(ctx context.Context, q Query) (Response, error) {
+	g.wait()
+	return getResponse(ctx, GenerateURL(q))
+}
+
+// Get() returns a response, which contains F.E question and its answer selected by Query, from website.
+// This process takes some time. You can cancel it by canceling context.
+//
+// The interval wait time is inserted between serial calling of this method.
+func (g *Getter) GetRandom(ctx context.Context) (Response, error) {
+	g.wait()
+	return getResponse(ctx, randomURL())
+}
+
 // Get() returns a response, which contains F.E question and its answer selected by Query, from website.
 // This process takes some time. You can cancel it by canceling context.
 func Get(ctx context.Context, q Query) (Response, error) {
-	return getResponse(ctx, GenerateURL(q))
+	return defaultGetter.Get(ctx, q)
 }
 
 // GetRandom() returns a response, which is randomly selected F.E question and its answer, from website.
 // This process takes some time. You can cancel it by canceling context.
 func GetRandom(ctx context.Context) (Response, error) {
-	return getResponse(ctx, randomURL())
+	return defaultGetter.GetRandom(ctx)
 }
 
 func getResponse(ctx context.Context, url string) (Response, error) {

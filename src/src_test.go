@@ -15,7 +15,7 @@ func TestGetRandom(t *testing.T) {
 	t.Skip("TODO")
 	// because the server stands outsider, accessing to the server should not be frequent.
 	const N = 10
-	const WAIT = 5
+	const WAIT = 1
 	ctx := context.Background()
 	for i := 0; i < N; i++ {
 		time.Sleep(time.Duration(rand.Intn(WAIT)+1) * time.Second) // wait time for server access.
