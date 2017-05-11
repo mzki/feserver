@@ -15,6 +15,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// TODO: add Getter to have interval time for server request.
+
 var targetURLTmpl = template.Must(template.New("targetURL").Parse(
 	`http://www.fe-siken.com/kakomon/{{.Year}}_{{.Season}}/q{{.No}}.html`))
 
@@ -96,7 +98,9 @@ func GenerateURL(q Query) string {
 type Response struct {
 	Question   string
 	Selections []string
-	Answer     string
+
+	Answer      string
+	Explanation string
 
 	// indicates Question, Selections or Answer contain some image.
 	// the response can not be represented by plain text only.
@@ -208,9 +212,10 @@ func parseDoc(doc *goquery.Document) (Response, error) {
 	}
 
 	return Response{
-		Question:   q_doc.Text(),
-		Selections: selections,
-		Answer:     fmt.Sprintf("正解：%s, 解説：%s", ansch_doc.Text(), ansbg_doc.Text()),
-		HasImage:   has_image,
+		Question:    q_doc.Text(),
+		Selections:  selections,
+		Answer:      ansch_doc.Text(),
+		Explanation: ansbg_doc.Text(),
+		HasImage:    has_image,
 	}, nil
 }

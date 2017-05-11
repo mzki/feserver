@@ -62,7 +62,8 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Fprintf(fpout, "Question:\n%v\nSelections:\n%v\nAnswer:\n%v\n", res.Question, res.Selections, res.Answer)
+	fmt.Fprintf(fpout, "Question:\n%v\nSelections:\n%v\nAnswer:\n%v\nExplanation:\n%v\n",
+		res.Question, res.Selections, res.Answer, res.Explanation)
 }
 
 func TestRandomQuery(t *testing.T) {
@@ -103,5 +104,6 @@ func TestParseDoc(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Fprintf(fpout, "Question:\n%v\nSelections:\n%v\nAnswer:\n%v\n", res.Question, res.Selections, res.Answer)
+	fmt.Fprintf(fpout, "Question:\n%v\nSelections:\n%v\nAnswer:\n%v\nExplanation:\n%v\n",
+		res.Question, res.Selections, res.Answer, res.Explanation)
 }
