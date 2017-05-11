@@ -12,7 +12,7 @@ import (
 )
 
 func TestGetRandom(t *testing.T) {
-	// t.Skip("TODO")
+	t.Skip("TODO")
 	// because the server stands outsider, accessing to the server should not be frequent.
 	const N = 10
 	const WAIT = 5
@@ -45,6 +45,24 @@ func TestGetRandom(t *testing.T) {
 			t.Errorf("not parsed URL: %s", res.URL)
 		}
 	}
+}
+
+func TestGet(t *testing.T) {
+	res, err := Get(context.Background(), Query{
+		Season: SeasonSpring,
+		Year:   28,
+		No:     2,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fpout, err := os.Create("got_out.html")
+	defer fpout.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Fprintf(fpout, "Question:\n%v\nSelections:\n%v\nAnswer:\n%v\n", res.Question, res.Selections, res.Answer)
 }
 
 func TestRandomQuery(t *testing.T) {
@@ -81,6 +99,7 @@ func TestParseDoc(t *testing.T) {
 	}
 
 	fpout, err := os.Create("out.html")
+	defer fpout.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
