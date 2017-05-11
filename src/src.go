@@ -13,29 +13,67 @@ import (
 var targetURLTmpl = template.Must(template.New("targetURL").Parse(
 	`http://www.fe-siken.com/kakomon/{{.Year}}_{{.Season}}/q{{.No}}.html`))
 
-type query struct {
+// Query is a query for source URL.
+// Its fields specifies which question is searched for.
+type Query struct {
 	Year   int
 	Season string
 	No     int
 }
 
-var (
-	yearRange   = [...]int{15, 27}
-	seasonRange = [...]string{"haru", "aki"}
-	noRange     = [...]int{1, 80}
+const (
+	// these represents query range.
+	MinYear = 15
+	MaxYear = 27
+
+	SeasonSpring = "haru"
+	SeasonAutumn = "aki"
+
+	MinNO = 1
+	MaxNO = 80
 )
 
+var (
+	yearRange   = [...]int{MinYear, MaxYear}
+	seasonRange = [...]string{SeasonSpring, SeasonAutumn}
+	noRange     = [...]int{MinNO, MaxNO}
+)
+
+// check whether query has correct value range?
+func (q Query) Validates() bool {
+	if y := q.Year; y < MinYear || y > MaxYear {
+		return false
+	}
+	if s := q.Season; s != SeasonSpring && s != SeasonAutumn {
+		return false
+	}
+	if n := q.No; n < MinNO || n > MaxNO {
+		return false
+	}
+	return true
+}
+
 // generates random query.
-func randomQuery() query {
-	year := rand.Intn(yearRange[1]-yearRange[0]+1) + yearRange[0]
-	no := rand.Intn(noRange[1]-noRange[0]+1) + noRange[0]
+func randomQuery() Query {
+	year := rand.Intn(MaxYear-MinYear+1) + MinYear
+	no := rand.Intn(MaxNO-MinNO+1) + MinNO
 	season := seasonRange[rand.Intn(len(seasonRange))]
-	return query{year, season, no}
+	return Query{year, season, no}
 }
 
 // generate random target URL.
 func randomURL() string {
 	q := randomQuery()
+	return GenerateURL(q)
+}
+
+// generate source URL with given query.
+// the query must have valid fields range
+// which can be validated by (Query).Validates().
+func GenerateURL(q Query) string {
+	if !q.Validates() {
+		panic(fmt.Sprintf("invalid query form %v", q))
+	}
 	buf := new(bytes.Buffer)
 	if err := targetURLTmpl.Execute(buf, &q); err != nil {
 		panic(err) // TODO
@@ -57,17 +95,25 @@ type Response struct {
 	URL string // source URL
 }
 
-// GetRandom returns a response, which is randomly selected F.E question and its answer, from website.
+// Get() returns a response, which contains F.E question and its answer selected by Query, from website.
+// This process takes some time. You can cancel it by canceling context.
+func Get(ctx context.Context, q Query) (Response, error) {
+	return getResponse(ctx, GenerateURL(q))
+}
+
+// GetRandom() returns a response, which is randomly selected F.E question and its answer, from website.
 // This process takes some time. You can cancel it by canceling context.
 func GetRandom(ctx context.Context) (Response, error) {
+	return getResponse(ctx, randomURL())
+}
+
+func getResponse(ctx context.Context, url string) (Response, error) {
 	resCh := make(chan Response, 1)
 	errCh := make(chan error, 1)
 
 	go func() {
 		defer close(resCh)
 		defer close(errCh)
-
-		url := randomURL()
 		doc, err := goquery.NewDocument(url)
 		if err != nil {
 			errCh <- err
