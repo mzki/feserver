@@ -4,8 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
+	"net/http"
 	"text/template"
+
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -22,13 +27,17 @@ type Query struct {
 }
 
 const (
-	// these represents query range.
-	MinYear = 15
-	MaxYear = 27
+	// These represents query range.
 
+	// Examination Year range
+	MinYear = 15
+	MaxYear = 28
+
+	// Examination Season selections
 	SeasonSpring = "haru"
 	SeasonAutumn = "aki"
 
+	// Question No.
 	MinNO = 1
 	MaxNO = 80
 )
@@ -40,17 +49,18 @@ var (
 )
 
 // check whether query has correct value range?
-func (q Query) Validates() bool {
+// nil error means query is valid.
+func (q Query) Validates() error {
 	if y := q.Year; y < MinYear || y > MaxYear {
-		return false
+		return fmt.Errorf("year must be in [%d:%d], but %d", MinYear, MaxYear, y)
 	}
 	if s := q.Season; s != SeasonSpring && s != SeasonAutumn {
-		return false
+		return fmt.Errorf("Season must be either %s or %s, but %s", SeasonSpring, SeasonAutumn, s)
 	}
 	if n := q.No; n < MinNO || n > MaxNO {
-		return false
+		return fmt.Errorf("Question No. must be in [%d:%d], but %d", MinNO, MaxNO, n)
 	}
-	return true
+	return nil
 }
 
 // generates random query.
@@ -71,8 +81,8 @@ func randomURL() string {
 // the query must have valid fields range
 // which can be validated by (Query).Validates().
 func GenerateURL(q Query) string {
-	if !q.Validates() {
-		panic(fmt.Sprintf("invalid query form %v", q))
+	if err := q.Validates(); err != nil {
+		panic(err)
 	}
 	buf := new(bytes.Buffer)
 	if err := targetURLTmpl.Execute(buf, &q); err != nil {
@@ -114,7 +124,8 @@ func getResponse(ctx context.Context, url string) (Response, error) {
 	go func() {
 		defer close(resCh)
 		defer close(errCh)
-		doc, err := goquery.NewDocument(url)
+		// doc, err := goquery.NewDocument(url)
+		doc, err := newDocument(url)
 		if err != nil {
 			errCh <- err
 			return
@@ -124,7 +135,7 @@ func getResponse(ctx context.Context, url string) (Response, error) {
 			errCh <- err
 			return
 		}
-		res.URL = doc.Url.String()
+		res.URL = url
 		resCh <- res
 	}()
 
@@ -136,6 +147,26 @@ func getResponse(ctx context.Context, url string) (Response, error) {
 	case err := <-errCh:
 		return Response{}, err
 	}
+}
+
+// newDocument() returns goquery.Document with UTF8 form.
+//
+// Because target url encoded by ShiftJIS,
+// conversion from ShiftJIS to UTF8 is required before parsing goquery.Document.
+// newDocument() performs that.
+func newDocument(url string) (*goquery.Document, error) {
+	res, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	html, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	r := transform.NewReader(bytes.NewReader(html), japanese.ShiftJIS.NewDecoder())
+	return goquery.NewDocumentFromReader(r)
 }
 
 func parseDoc(doc *goquery.Document) (Response, error) {
