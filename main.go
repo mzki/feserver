@@ -1,8 +1,9 @@
 package main
 
 import (
-	"local/feserver/server"
 	"log"
+
+	"github.com/mzki/feserver/server"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-//go:generate gopherjs build local/feserver/src/js -o fesrc.js -m
+//go:generate gopherjs build github.com/mzki/feserver/src/js -o fesrc.js -m
 //
 // +build js
 
@@ -10,8 +10,7 @@ import (
 	"time"
 
 	"github.com/gopherjs/gopherjs/js"
-
-	"local/feserver/src"
+	"github.com/mzki/feserver/src"
 )
 
 func TimeoutCtx(timeout uint64) (context.Context, context.CancelFunc) {

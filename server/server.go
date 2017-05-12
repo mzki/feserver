@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"local/feserver/src"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/mzki/feserver/src"
 )
 
 // TODO: cache for Response from source.

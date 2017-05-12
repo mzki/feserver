@@ -8,10 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/text/encoding/japanese"
 	"golang.org/x/text/transform"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
 // Response is a result of parsing a web page
