@@ -12,7 +12,7 @@ import (
 )
 
 func TestGetRandom(t *testing.T) {
-	t.Skip("TODO")
+	t.Skip("Server Access is prevented")
 	// because the server stands outsider, accessing to the server should not be frequent.
 	const N = 10
 	const WAIT = 1
@@ -48,6 +48,7 @@ func TestGetRandom(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
+	t.Skip("Server Access is prevented")
 	res, err := Get(context.Background(), Query{
 		Season: SeasonSpring,
 		Year:   28,
@@ -106,4 +107,26 @@ func TestParseDoc(t *testing.T) {
 	}
 	fmt.Fprintf(fpout, "Question:\n%v\nSelections:\n%v\nAnswer:\n%v\nExplanation:\n%v\n",
 		res.Question, res.Selections, res.Answer, res.Explanation)
+}
+
+func TestParseDocHasImage(t *testing.T) {
+	fp, err := os.Open("./y19_spring_q26.html")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer fp.Close()
+
+	doc, err := goquery.NewDocumentFromReader(fp)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	res, err := parseDoc(doc)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if res.HasImage {
+		t.Fatal("must not have some image, but HasImage is true")
+	}
 }
