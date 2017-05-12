@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"strings"
 	"text/template"
 	"time"
 
@@ -15,6 +16,8 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 )
+
+// TODO: has image logic is incorrect.
 
 var targetURLTmpl = template.Must(template.New("targetURL").Parse(
 	`http://www.fe-siken.com/kakomon/{{.Year}}_{{.Season}}/q{{.No}}.html`))
@@ -72,8 +75,8 @@ func randomQuery() Query {
 	return Query{year, season, no}
 }
 
-// generate random target URL.
-func randomURL() string {
+// generate target URL with randomized query.
+func RandomURL() string {
 	q := randomQuery()
 	return GenerateURL(q)
 }
@@ -151,7 +154,7 @@ func (g *Getter) Get(ctx context.Context, q Query) (Response, error) {
 // The interval wait time is inserted between serial calling of this method.
 func (g *Getter) GetRandom(ctx context.Context) (Response, error) {
 	g.wait()
-	return getResponse(ctx, randomURL())
+	return getResponse(ctx, RandomURL())
 }
 
 // Get() returns a response, which contains F.E question and its answer selected by Query, from website.
@@ -263,4 +266,15 @@ func parseDoc(doc *goquery.Document) (Response, error) {
 		Explanation: ansbg_doc.Text(),
 		HasImage:    has_image,
 	}, nil
+}
+
+// ParseHTML is helper funtion which parses html text and
+// converts to f.e. question Response.
+func ParseHTML(html string) (Response, error) {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
+	if err != nil {
+		return Response{}, err
+	}
+
+	return parseDoc(doc)
 }
