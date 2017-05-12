@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strings"
+	"sync"
 	"text/template"
 	"time"
 
@@ -67,11 +68,18 @@ func (q Query) Validates() error {
 	return nil
 }
 
+var randMutex = new(sync.Mutex)
+
+// package global random state. under mutex.
+var random = rand.New(rand.NewSource(time.Now().UnixNano()))
+
 // generates random query.
 func randomQuery() Query {
-	year := rand.Intn(MaxYear-MinYear+1) + MinYear
-	no := rand.Intn(MaxNO-MinNO+1) + MinNO
-	season := seasonRange[rand.Intn(len(seasonRange))]
+	randMutex.Lock()
+	year := random.Intn(MaxYear-MinYear+1) + MinYear
+	no := random.Intn(MaxNO-MinNO+1) + MinNO
+	season := seasonRange[random.Intn(len(seasonRange))]
+	randMutex.Unlock()
 	return Query{year, season, no}
 }
 
