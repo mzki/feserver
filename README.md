@@ -1,7 +1,7 @@
 # feserver
 A server providing [F.E. examination](https://www.jitec.ipa.go.jp/1_11seido/fe.html) questions 
 which have been appeared in the past.
-The past questions collection is derived from http://www.fe-siken.com.
+The past questions are obtained from http://www.fe-siken.com.
 Thanks to the great Web site!
 
 
@@ -18,7 +18,7 @@ To start server process, just type
 feserver
 ```
 then access `localhost:8080/r-question.json`,
-you can get a json response containing F.E. question which is randomly selected.   
+you can get a json response which contains F.E. question randomly selected.   
 
 ## API
 
