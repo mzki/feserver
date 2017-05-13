@@ -18,7 +18,7 @@ func main() {
 			count, errCount := countHasImage(y, s)
 			totalCount += count
 			cycle += 1
-			fmt.Fprintf(os.Stdout, "year:%d, season:%s, imageCount:%d/%d, rate:%.1f, errCount:%d\n",
+			fmt.Fprintf(os.Stdout, "year:%d, season:%s, imageCount:%d/%d, rate:%.2f, errCount:%d\n",
 				y, s, count, src.MaxNO, float64(count)/float64(src.MaxNO), errCount)
 		}
 	}

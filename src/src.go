@@ -85,9 +85,10 @@ func (g *Getter) Get(ctx context.Context, q Query) (Response, error) {
 // This process takes some time. You can cancel it by canceling context.
 //
 // The interval wait time is inserted between serial calling of this method.
-func (g *Getter) GetRandom(ctx context.Context) (Response, error) {
+// use default random range if RandomRange is nil.
+func (g *Getter) GetRandom(ctx context.Context, qr *QueryRange) (Response, error) {
 	g.wait()
-	return getResponse(ctx, RandomURL())
+	return getResponse(ctx, RandomURL(qr))
 }
 
 // Get() returns a response, which contains F.E question and its answer selected by Query, from website.
@@ -98,8 +99,9 @@ func Get(ctx context.Context, q Query) (Response, error) {
 
 // GetRandom() returns a response, which is randomly selected F.E question and its answer, from website.
 // This process takes some time. You can cancel it by canceling context.
-func GetRandom(ctx context.Context) (Response, error) {
-	return defaultGetter.GetRandom(ctx)
+// use default random range if RandomRange is nil.
+func GetRandom(ctx context.Context, qr *QueryRange) (Response, error) {
+	return defaultGetter.GetRandom(ctx, qr)
 }
 
 func getResponse(ctx context.Context, url string) (Response, error) {
@@ -109,7 +111,6 @@ func getResponse(ctx context.Context, url string) (Response, error) {
 	go func() {
 		defer close(resCh)
 		defer close(errCh)
-		// doc, err := goquery.NewDocument(url)
 		doc, err := newDocument(url)
 		if err != nil {
 			errCh <- err
@@ -136,7 +137,7 @@ func getResponse(ctx context.Context, url string) (Response, error) {
 
 // newDocument() returns goquery.Document with UTF8 form.
 //
-// Because target url encoded by ShiftJIS,
+// Because target url has a content encoded by ShiftJIS,
 // conversion from ShiftJIS to UTF8 is required before parsing goquery.Document.
 // newDocument() performs that.
 func newDocument(url string) (*goquery.Document, error) {

@@ -19,7 +19,7 @@ func TestGetRandom(t *testing.T) {
 	ctx := context.Background()
 	for i := 0; i < N; i++ {
 		time.Sleep(time.Duration(rand.Intn(WAIT)+1) * time.Second) // wait time for server access.
-		res, err := GetRandom(ctx)
+		res, err := GetRandom(ctx, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -70,7 +70,7 @@ func TestGet(t *testing.T) {
 func TestRandomQuery(t *testing.T) {
 	const randomN = 100
 	for i := 0; i < randomN; i++ {
-		q := randomQuery()
+		q := randomQuery(&defaultQueryRange)
 		if s := q.Season; s != seasonRange[0] && s != seasonRange[1] {
 			t.Errorf("invaid season, got: %s", s)
 		}

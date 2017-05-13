@@ -24,7 +24,7 @@ func TimeoutCtx(timeout uint64) (context.Context, context.CancelFunc) {
 func GetRandom(timeout uint64) *src.Response {
 	ctx, cancel := TimeoutCtx(timeout)
 	defer cancel()
-	res, err := src.GetRandom(ctx)
+	res, err := src.GetRandom(ctx, nil)
 	if err != nil {
 		log.Println(err)
 		return nil
