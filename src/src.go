@@ -36,6 +36,9 @@ var defaultGetter = NewGetter(LeastIntervalTime)
 // the minimum time for request interval.
 const LeastIntervalTime = 5 * time.Second
 
+// interval time varies plus or minus VariationCoef second.
+const VariationCoef = 2
+
 // Getter is a interface for F.E. question and answer from webpage.
 // serial requests are splited by some interval time so that
 // the number of accessing the outer server is reduced.
@@ -47,13 +50,23 @@ type Getter struct {
 // return new Getter with intervalTime for server request.
 func NewGetter(intervalTime time.Duration) *Getter {
 	if intervalTime < LeastIntervalTime {
-		panic("intervalTime must be > " + LeastIntervalTime.String())
+		panic("intervalTime must be >= " + LeastIntervalTime.String())
 	}
 	return &Getter{intervalTime: intervalTime, lastRequest: time.Time{}}
 }
 
 func (g *Getter) wait() {
-	if wait := g.intervalTime - time.Since(g.lastRequest); wait > 0 {
+	// all of the exported method check this.
+	if g.intervalTime < LeastIntervalTime {
+		panic("intervalTime must be >= " + LeastIntervalTime.String())
+	}
+
+	randMutex.Lock()
+	coef := random.Intn(2*VariationCoef+1) - VariationCoef
+	randMutex.Unlock()
+
+	noisedInterval := g.intervalTime + time.Duration(coef)*time.Second
+	if wait := noisedInterval - time.Since(g.lastRequest); wait > 0 {
 		time.Sleep(wait)
 	}
 	g.lastRequest = time.Now()
