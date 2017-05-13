@@ -1,6 +1,4 @@
-//go:generate gopherjs build github.com/mzki/feserver/src/js -o fesrc.js -m
-//
-// +build js
+//go:generate gopherjs build -o fesrc.js -m
 
 package main
 

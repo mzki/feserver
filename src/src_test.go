@@ -84,7 +84,7 @@ func TestRandomQuery(t *testing.T) {
 }
 
 func TestParseDoc(t *testing.T) {
-	fp, err := os.Open("./test_u8.html")
+	fp, err := os.Open("./test.html")
 	if err != nil {
 		t.Fatal(err)
 	}

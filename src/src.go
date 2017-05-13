@@ -1,3 +1,5 @@
+//go:generate sh ./gen_test.sh
+
 package src
 
 import (
