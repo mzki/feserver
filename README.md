@@ -26,4 +26,4 @@ you can get a json response containing F.E. question which is randomly selected.
 
 ## License
 
-TODO
+The BSD 3-Clause license, the same as the [Go](https://golang.org/).
