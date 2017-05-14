@@ -141,8 +141,8 @@ func (s *Server) ListenAndServe() error {
 
 	serverURL := s.conf.URL + ":" + s.conf.Port
 	server.Addr = serverURL
-	log.Println("launch on " + serverURL + URLGetRandom)
-	log.Println("launch on " + serverURL + URLGetQuestion)
+	log.Println("listen on " + serverURL + URLGetRandom)
+	log.Println("listen on " + serverURL + URLGetQuestion)
 
 	return s.server.ListenAndServe()
 }

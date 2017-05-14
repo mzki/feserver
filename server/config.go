@@ -10,6 +10,9 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+// default Server configuration file.
+const ConfigFile = "config.toml"
+
 // Configuration for server behavior.
 // it must construct by LoadConfig() or LoadConfigFile().
 type Config struct {

@@ -1,0 +1,3 @@
+Port       = "8080"          # Port number written as string
+URL        = "localhost"     # URL name
+WaitSecond = 3               # timeout limit for request.
