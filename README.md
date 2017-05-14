@@ -17,12 +17,28 @@ To start server process, just type
 ```
 feserver
 ```
-then access `localhost:8080/r-question.json`,
-you can get a json response which contains F.E. question randomly selected.   
 
-## API
+## Web API
 
-`github.com/mzki/feserver/src` provides API for getting the F.E. questions.
+feserver provides the following Web APIs:
+
+* `[server-URL]:[server-Port]/r-question.json`
+
+It returns json response which contains F.E. question randomly selected.
+
+* `[server-URL]:[server-Port]/question.json?year=[year]&season=[haru|aki]&no=[no]`
+
+It returns json response which contains F.E. question specified by the query parameters.
+
+
+## Configuration
+
+feserver initially loads `config.toml` as configuration file.
+See `config.toml` at top directory for more detail.
+
+## Library
+
+`github.com/mzki/feserver/src` provides the library for getting the F.E. questions.
 
 ## License
 
