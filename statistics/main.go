@@ -19,11 +19,11 @@ func main() {
 			totalCount += count
 			cycle += 1
 			fmt.Fprintf(os.Stdout, "year:%d, season:%s, imageCount:%d/%d, rate:%.2f, errCount:%d\n",
-				y, s, count, src.MaxNO, float64(count)/float64(src.MaxNO), errCount)
+				y, s, count, src.MaxNo, float64(count)/float64(src.MaxNo), errCount)
 		}
 	}
 	fmt.Fprintf(os.Stdout, "# total, imageCount:%d/%d, rate:%.2f\n",
-		totalCount, cycle*src.MaxNO, float64(totalCount)/float64(cycle*src.MaxNO))
+		totalCount, cycle*src.MaxNo, float64(totalCount)/float64(cycle*src.MaxNo))
 }
 
 var getter = src.NewGetter(src.LeastIntervalTime)
@@ -32,7 +32,7 @@ func countHasImage(year int, season string) (int, int) {
 	ctx := context.Background()
 	count := 0
 	errCount := 0
-	for q := src.MinNO; q <= src.MaxNO; q++ {
+	for q := src.MinNo; q <= src.MaxNo; q++ {
 		res, err := getter.Get(ctx, src.Query{
 			Year:   year,
 			Season: season,

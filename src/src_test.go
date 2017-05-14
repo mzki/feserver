@@ -70,7 +70,7 @@ func TestGet(t *testing.T) {
 func TestRandomQuery(t *testing.T) {
 	const randomN = 100
 	for i := 0; i < randomN; i++ {
-		q := randomQuery(&defaultQueryRange)
+		q := randomQuery(&DefaultQueryRange)
 		if s := q.Season; s != seasonRange[0] && s != seasonRange[1] {
 			t.Errorf("invaid season, got: %s", s)
 		}

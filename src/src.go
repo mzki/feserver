@@ -18,17 +18,17 @@ import (
 // Response is a result of parsing a web page
 // that have the F.E. question and its answer.
 type Response struct {
-	Question   string
-	Selections []string
+	Question   string   `json:"question"`
+	Selections []string `json:"selections"`
 
-	Answer      string
-	Explanation string
+	Answer      string `json:"answer"`
+	Explanation string `json:"explanation"`
 
 	// indicates Question, Selections or Answer contain some image.
 	// the response can not be represented by plain text only.
-	HasImage bool
+	HasImage bool `json:"hasImage"`
 
-	URL string // source URL
+	URL string `json:"url"` // source URL
 }
 
 var defaultGetter = NewGetter(LeastIntervalTime)

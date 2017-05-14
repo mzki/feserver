@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	if err := server.ListenAndServe(); err != nil {
+	if err := server.ListenAndServe(nil); err != nil {
 		log.Fatal(err)
 	}
 }

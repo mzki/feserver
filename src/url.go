@@ -58,7 +58,7 @@ func (q Query) Validates() error {
 	return nil
 }
 
-var defaultQueryRange = QueryRange{
+var DefaultQueryRange = QueryRange{
 	MaxYear: MaxYear, MinYear: MinYear,
 	MaxNo: MaxNo, MinNo: MinNo,
 	Season: SeasonAll,
@@ -88,10 +88,12 @@ func (qr QueryRange) Validates() error {
 		return fmt.Errorf("src.QueryRange: MaxNo must be larger then MinNo but Max: %d, Min: %d", qr.MaxNo, qr.MinNo)
 	}
 	// check season
-	if s := qr.Season; s != SeasonAll || s != SeasonSpring || s != SeasonAutumn {
+	switch s := qr.Season; s {
+	case SeasonAll, SeasonSpring, SeasonAutumn:
+		return nil
+	default:
 		return fmt.Errorf("src.QueryRange: Season must be %s, %s or %s", SeasonSpring, SeasonAutumn, SeasonAll)
 	}
-	return nil
 }
 
 func (qr QueryRange) season(r *rand.Rand) string {
@@ -143,7 +145,7 @@ func autumnPublished() bool {
 // use default range if QueryRange is nil
 func RandomURL(qr *QueryRange) string {
 	if qr == nil {
-		qr = &defaultQueryRange
+		qr = &DefaultQueryRange
 	}
 	q := randomQuery(qr)
 	return GenerateURL(q)
