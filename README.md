@@ -30,6 +30,17 @@ It returns json response which contains F.E. question randomly selected.
 
 It returns json response which contains F.E. question specified by the query parameters.
 
+### Response 
+
+The returned json-response has:
+
+* `question`: Question text
+* `selections`: Selections for Answer.
+* `answer`: Answer Character, ア, イ, ウ, エ.
+* `explanation`: Explanation for the Answer.
+* `hasImage`: question, selections, or answer contain some images. These might not be represented by only text.
+* `url`: Source URL in which the question is retrieved.
+* `error`: Error message. Empty message indicates non-error.
 
 ## Configuration
 
@@ -38,7 +49,8 @@ See `config.toml` at top directory for more detail.
 
 ## Library
 
-`github.com/mzki/feserver/src` provides the library for getting the F.E. questions.
+`github.com/mzki/feserver/src` provides the Go library for getting the F.E. questions.
+you can write program using it.
 
 ## License
 
