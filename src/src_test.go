@@ -58,7 +58,7 @@ func TestGet(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fpout, err := os.Create("got_out.html")
+	fpout, err := os.Create("test_get.txt")
 	defer fpout.Close()
 	if err != nil {
 		t.Fatal(err)
@@ -84,13 +84,7 @@ func TestRandomQuery(t *testing.T) {
 }
 
 func TestParseDoc(t *testing.T) {
-	fp, err := os.Open("./test.html")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer fp.Close()
-
-	doc, err := goquery.NewDocumentFromReader(fp)
+	doc, err := goqueryDocFile("./y28_spring_q2.html")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +94,7 @@ func TestParseDoc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fpout, err := os.Create("out.html")
+	fpout, err := os.Create("test_parse_doc.txt")
 	defer fpout.Close()
 	if err != nil {
 		t.Fatal(err)
@@ -110,13 +104,7 @@ func TestParseDoc(t *testing.T) {
 }
 
 func TestParseDocHasImage(t *testing.T) {
-	fp, err := os.Open("./y19_spring_q26.html")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer fp.Close()
-
-	doc, err := goquery.NewDocumentFromReader(fp)
+	doc, err := goqueryDocFile("./y19_spring_q26.html")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -128,5 +116,60 @@ func TestParseDocHasImage(t *testing.T) {
 
 	if res.HasImage {
 		t.Fatal("must not have some image, but HasImage is true")
+	}
+}
+
+func TestParseDocExplainCh(t *testing.T) {
+	for _, testcase := range []struct {
+		in, out string
+	}{
+		{"./y28_spring_q2.html", "./y28_spring_q2.txt"},
+		{"./y19_spring_q26.html", "./y19_spring_q26.txt"},
+	} {
+		doc, err := goqueryDocFile(testcase.in)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		res, err := parseDoc(doc)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		fpout, err := os.Create(testcase.out)
+		if err != nil {
+			t.Fatal(err)
+		}
+		fmt.Fprintf(fpout, "Question:\n%v\nSelections:\n%v\nAnswer:\n%v\nExplanation:\n%v\n",
+			res.Question, res.Selections, res.Answer, res.Explanation)
+		fpout.Close()
+	}
+}
+
+func goqueryDocFile(file string) (*goquery.Document, error) {
+	fp, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer fp.Close()
+
+	return goquery.NewDocumentFromReader(fp)
+}
+
+func BenchmarkParseDoc(b *testing.B) {
+	doc, err := goqueryDocFile("./y28_spring_q2.html")
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		clone := doc.Selection.Clone()
+		b.StartTimer()
+		_, err := parseDoc(doc)
+		if err != nil {
+			b.Fatal(err)
+		}
+		doc.Selection = clone
 	}
 }

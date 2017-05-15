@@ -14,8 +14,11 @@ else
 fi
 
 # get testing html.
-wget -O ./test.html -A html http://www.fe-siken.com/kakomon/28_haru/q2.html 
-nkf -S -w8 --in-place ./test.html 
+wget -O ./y28_spring_q2.html -A html http://www.fe-siken.com/kakomon/28_haru/q2.html 
+nkf -S -w8 --in-place ./y28_spring_q2.html
 
 wget -O ./y19_spring_q26.html -A html http://www.fe-siken.com/kakomon/19_haru/q26.html 
-# nkf -S -w8 --in-place ./y19_spring_q26.html 
+nkf -S -w8 --in-place ./y19_spring_q26.html 
+
+wget -O ./y28_spring_q11.html -A html http://www.fe-siken.com/kakomon/28_haru/q11.html 
+nkf -S -w8 --in-place ./y28_spring_q11.html 

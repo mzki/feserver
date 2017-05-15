@@ -159,6 +159,8 @@ func parseDoc(doc *goquery.Document) (Response, error) {
 	// parse section for a question.
 	q_doc := doc.Find("div.main.kako > h3.qno").Next()
 	if q_doc == nil {
+		// goquery API never return nil, return doc with zero length.
+		// This code wont be executed.
 		panic("nil Document")
 	}
 
@@ -185,6 +187,27 @@ func parseDoc(doc *goquery.Document) (Response, error) {
 	ansbg_doc := ans_doc.Next().Next() // div.ansbg
 	if ansbg_doc == nil {
 		panic("nil Document")
+	}
+
+	// make it visible answer characters in the explanation.
+	const (
+		explainA = "ul > li.lia"
+		explainI = "ul > li.lii"
+		explainU = "ul > li.liu"
+		explainE = "ul > li.lie"
+	)
+	if firstLi := ansbg_doc.Find(explainA); firstLi.Length() > 0 {
+		ul := firstLi.Parent()
+		ul.PrependHtml("\n")
+		for _, selector := range []struct {
+			ch    string
+			query string
+		}{
+			{"ア", explainA}, {"イ", explainI}, {"ウ", explainU}, {"エ", explainE},
+		} {
+			sel := ansbg_doc.Find(selector.query)
+			sel.SetText(selector.ch + ":" + sel.Text() + "\n") // modifies content.
+		}
 	}
 
 	// check whether the question has some image?
