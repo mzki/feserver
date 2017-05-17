@@ -31,7 +31,7 @@ type Response struct {
 	URL string `json:"url"` // source URL
 }
 
-var defaultGetter = NewGetter(LeastIntervalTime)
+var defaultGetter = NewGetter(FE, LeastIntervalTime)
 
 // the minimum time for request interval.
 const LeastIntervalTime = 5 * time.Second
@@ -43,18 +43,28 @@ const VariationCoef = 2
 // serial requests are splited by some interval time so that
 // the number of accessing the outer server is reduced.
 type Getter struct {
+	url *urlGenerator
+
 	intervalTime time.Duration
 	lastRequest  time.Time
 }
 
-// return new Getter with intervalTime for server request.
-func NewGetter(intervalTime time.Duration) *Getter {
+// return new Getter with question source and
+// intervalTime for server request.
+// it will panic if intervalTime less than LeastIntervalTime.
+func NewGetter(s Source, intervalTime time.Duration) *Getter {
 	if intervalTime < LeastIntervalTime {
 		panic("intervalTime must be >= " + LeastIntervalTime.String())
 	}
-	return &Getter{intervalTime: intervalTime, lastRequest: time.Time{}}
+	return &Getter{
+		url:          newURLGenerator(s),
+		intervalTime: intervalTime,
+		lastRequest:  time.Time{},
+	}
 }
 
+// To reduce the frequent request for the server,
+// wait interval time between the requests.
 func (g *Getter) wait() {
 	// all of the exported method check this.
 	if g.intervalTime < LeastIntervalTime {
@@ -72,23 +82,32 @@ func (g *Getter) wait() {
 	g.lastRequest = time.Now()
 }
 
-// Get() returns a response, which contains F.E question and its answer selected by Query, from website.
+// Get returns a response, which contains F.E question and its answer selected by Query, from website.
 // This process takes some time. You can cancel it by canceling context.
 //
 // The interval wait time is inserted between serial calling of this method.
 func (g *Getter) Get(ctx context.Context, q Query) (Response, error) {
+	url, err := g.url.Generate(q)
+	if err != nil {
+		return Response{}, err
+	}
 	g.wait()
-	return getResponse(ctx, GenerateURL(q))
+	return getResponse(ctx, url)
 }
 
-// Get() returns a response, which contains F.E question and its answer selected by Query, from website.
+// GetRandom returns a response, which contains F.E question and its answer selected randomly
+// in range QueryRange, from website.
 // This process takes some time. You can cancel it by canceling context.
 //
 // The interval wait time is inserted between serial calling of this method.
-// use default random range if RandomRange is nil.
-func (g *Getter) GetRandom(ctx context.Context, qr *QueryRange) (Response, error) {
+// use maximum query range if MaxQueryRange is given.
+func (g *Getter) GetRandom(ctx context.Context, qr QueryRange) (Response, error) {
+	url, err := g.url.Random(qr)
+	if err != nil {
+		return Response{}, err
+	}
 	g.wait()
-	return getResponse(ctx, RandomURL(qr))
+	return getResponse(ctx, url)
 }
 
 // Get() returns a response, which contains F.E question and its answer selected by Query, from website.
@@ -99,8 +118,8 @@ func Get(ctx context.Context, q Query) (Response, error) {
 
 // GetRandom() returns a response, which is randomly selected F.E question and its answer, from website.
 // This process takes some time. You can cancel it by canceling context.
-// use default random range if RandomRange is nil.
-func GetRandom(ctx context.Context, qr *QueryRange) (Response, error) {
+// use maximum query range if MaxQueryRange is given.
+func GetRandom(ctx context.Context, qr QueryRange) (Response, error) {
 	return defaultGetter.GetRandom(ctx, qr)
 }
 
@@ -226,7 +245,7 @@ func parseDoc(doc *goquery.Document) (Response, error) {
 }
 
 // ParseHTML is helper funtion which parses html text and
-// converts to f.e. question Response.
+// converts to Response.
 func ParseHTML(html string) (Response, error) {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
 	if err != nil {

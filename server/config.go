@@ -5,9 +5,9 @@ import (
 	"io"
 	"log"
 	"os"
-	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/mzki/feserver/src"
 )
 
 // default Server configuration file.
@@ -22,9 +22,8 @@ type Config struct {
 	// server URL
 	URL string
 
-	// Wait time for the requesting, in second.
-	WaitSecond int
-	waitTime   time.Duration
+	// Source location for get questions.
+	Sources []Source
 }
 
 func (conf *Config) validates() error {
@@ -32,11 +31,16 @@ func (conf *Config) validates() error {
 	if p := conf.Port; p == "" {
 		return fmt.Errorf("Config: empty Port, must be exist.")
 	}
-	// check WaitSecond
-	if ws := conf.WaitSecond; ws < 0 {
-		return fmt.Errorf("Config: incorrect WaitSecond %d, must be positive.", ws)
-	} else {
-		conf.waitTime = time.Duration(ws) * time.Second
+
+	// check sources
+	for _, s := range conf.Sources {
+		if err := s.Source.ValidatesSelf(); err != nil {
+			return fmt.Errorf("Config: invalid source: %v", err)
+		}
+		// check WaitSecond
+		if ws := s.WaitSecond; ws < 0 {
+			return fmt.Errorf("Config: incorrect WaitSecond %d, must be positive.", ws)
+		}
 	}
 	return nil
 }
@@ -49,9 +53,44 @@ const (
 )
 
 var DefaultConfig = Config{
-	URL:        DefaultURL,
-	Port:       DefaultPort,
+	URL:  DefaultURL,
+	Port: DefaultPort,
+	Sources: []Source{
+		DefaultSource,
+		FESource,
+		APSource,
+	},
+}
+
+// DefaultSource has F.E. examination source.
+var DefaultSource = Source{
+	SubAddr:    "",
+	Source:     src.FE,
 	WaitSecond: DefaultWaitSecond,
+}
+
+//	FESource has F.E. examination source.
+var FESource = Source{
+	SubAddr:    "/fe",
+	Source:     src.FE,
+	WaitSecond: DefaultWaitSecond,
+}
+
+//	APSource has A.P. examination source.
+var APSource = Source{
+	SubAddr:    "/ap",
+	Source:     src.AP,
+	WaitSecond: DefaultWaitSecond,
+}
+
+// Source is the source definition for getting questions.
+type Source struct {
+	src.Source
+
+	// sub address.
+	SubAddr string
+	// Wait time for the requesting, in second.
+	WaitSecond int
 }
 
 // it loads the configuration from file.

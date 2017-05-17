@@ -7,7 +7,7 @@ import (
 	"github.com/mzki/feserver/src"
 )
 
-// it represents json response returned // from the server.
+// it represents json response returned from the server.
 type JSONResponse struct {
 	src.Response
 	Error string `json:"error"`

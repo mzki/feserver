@@ -20,7 +20,7 @@ func TestParseGetRandomQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	qr, err := parseGetRandomQuery(url.Query())
+	qr, err := parseGetRandomQuery(url.Query(), DefaultSource)
 	if err != nil {
 		t.Fatal(err)
 	}
