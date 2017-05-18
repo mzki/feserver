@@ -4,6 +4,12 @@ which have been appeared in the past.
 The past questions are obtained from http://www.fe-siken.com.
 Thanks to the great Web site!
 
+feserver can also serve the questions from the other IPA examinations 
+such as [A.P.](https://www.jitec.ipa.go.jp/1_11seido/ap.html)!
+
+
+## 
+
 
 ## Installation
 
@@ -18,21 +24,31 @@ To start server process, just type
 feserver
 ```
 
+And then you will see the JSON response by 
+
+```
+curl http://localhost:8080/r-question.json
+```
+
+The JSON response contains F.E. question and its answer.
+For more detail see JSON Response section.
+
+
 ## Web API
 
 feserver provides the following Web APIs:
 
-* `[server-URL]:[server-Port]/r-question.json`
+* `[server-address]/[sub-address]/r-question.json`
 
-It returns json response which contains F.E. question randomly selected.
+It returns json response which contains the question randomly selected.
 
-* `[server-URL]:[server-Port]/question.json?year=[year]&season=[haru|aki]&no=[no]`
+* `[server-address]/[sub-address]/question.json?year=[year]&season=[haru|aki]&no=[no]`
 
-It returns json response which contains F.E. question specified by the query parameters.
+It returns json response which contains the question specified by the query parameters.
 
-### Response 
+# JSON Response 
 
-The returned json-response has:
+The returned JSON response has:
 
 * `question`: Question text
 * `selections`: Selections for Answer.
@@ -44,13 +60,39 @@ The returned json-response has:
 
 ## Configuration
 
-feserver initially loads `config.toml` as configuration file.
-See `config.toml` at top directory for more detail.
+By default, feserver initially loads `config.toml` at the feserver's repository under `GOPATH`.
+`config.toml` defines question source locations for serving the content.
+See `config.toml` for more detail.
 
 ## Library
 
-`github.com/mzki/feserver/src` provides the Go library for getting the F.E. questions.
-you can write program using it.
+`src` directory provides the Go library for getting the F.E. questions or others.
+
+Example:
+
+```go
+// make context with timeout for 3 second.
+ctx := context.WithTimeout(context.Background(), 3*time.Second)
+
+// get src.Response for the question randomly selected.
+res, _ := src.GetRandom(ctx, src.MaxQueryRange)
+
+```
+
+You can create src.Getter with arbitrary source location.
+
+```go
+// construct Getter with A.P. examination source and 
+// interval time for the request
+g := src.NewGetter(src.AP, src.LeastIntervalTime)
+
+// get A.P. question at H29, Spirng, No. 10.
+res, _ := g.Get(context.Background(), Query{29, src.SeasonSpring, 10})
+
+// get A.P. question randomly selected
+res, _ = g.GetRandom(context.Background(), src.MaxQueryRange)
+```
+
 
 ## License
 
