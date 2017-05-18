@@ -7,10 +7,6 @@ Thanks to the great Web site!
 feserver can also serve the questions from the other IPA examinations 
 such as [A.P.](https://www.jitec.ipa.go.jp/1_11seido/ap.html)!
 
-
-## 
-
-
 ## Installation
 
 To install the command, run: 
@@ -46,7 +42,7 @@ It returns json response which contains the question randomly selected.
 
 It returns json response which contains the question specified by the query parameters.
 
-# JSON Response 
+## JSON Response 
 
 The returned JSON response has:
 
