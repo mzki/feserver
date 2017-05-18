@@ -3,7 +3,6 @@ package server
 import (
 	"log"
 	"net/http"
-	"path"
 )
 
 // TODO: cache for Response from source.
@@ -50,7 +49,7 @@ func (s *Server) ListenAndServe() error {
 		return err
 	}
 
-	serverURL := s.conf.URL + ":" + s.conf.Port
+	serverURL := s.conf.HTTP
 
 	handler := http.NewServeMux()
 	for addr, sub := range s.subServers {
@@ -62,7 +61,7 @@ func (s *Server) ListenAndServe() error {
 			{addr + APIGetQuestion, sub.getQuestionJSON},
 		} {
 			handler.HandleFunc(api.path, api.handler)
-			log.Println("listen on " + path.Join(serverURL, api.path))
+			log.Println("listen on " + serverURL + api.path)
 		}
 	}
 

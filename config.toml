@@ -1,3 +1,38 @@
-Port       = "8080"          # Port number written as string
-URL        = "localhost"     # URL name
-WaitSecond = 3               # timeout limit for request.
+HTTP       = "localhost:8080"  # http service address
+
+# F.E question definition.
+[[Sources]]
+  SubAddr    = "/fe"           # sub address in the API path. Must be uniqe.
+  WaitSecond = 3               # timeout limit for request.
+
+  # URL template which accepts parameters Year, Season and No.
+  URL = "http://www.fe-siken.com/kakomon/{{.Year}}_{{.Season}}/q{{.No}}.html"
+  MaxYear = 29                 # Maximum year limit.
+  MinYear = 13                 # Minimum year limit.
+  MaxNo = 80                   # Maximum quesiton number.
+  MinNo = 1                    # Mimimum quesiton number.
+  Season = "all"               # Season in which the examination is hold. [ "haru" | "aki" | "all" ]
+
+# A.P. question definition.
+[[Sources]]
+  SubAddr    = "/ap"           
+  WaitSecond = 3               
+
+  URL = "http://www.ap-siken.com/kakomon/{{.Year}}_{{.Season}}/q{{.No}}.html"
+  MaxYear = 29               
+  MinYear = 13               
+  MaxNo = 80                 
+  MinNo = 1                  
+  Season = "all"             
+
+# root path serves F.E. quesiton.
+[[Sources]]
+  SubAddr    = ""           
+  WaitSecond = 3               
+
+  URL = "http://www.fe-siken.com/kakomon/{{.Year}}_{{.Season}}/q{{.No}}.html"
+  MaxYear = 29               
+  MinYear = 13               
+  MaxNo = 80                 
+  MinNo = 1                  
+  Season = "all"             

@@ -70,7 +70,7 @@ const (
 	StratMax = 80
 )
 
-var getter = src.NewGetter(src.LeastIntervalTime, src.FE)
+var getter = src.NewGetter(src.FE, src.LeastIntervalTime)
 
 func countHasImage(year int, season string) (count, techC, manaC, stratC, errCount int) {
 	ctx := context.Background()

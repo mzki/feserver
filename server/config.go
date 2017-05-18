@@ -10,28 +10,17 @@ import (
 	"github.com/mzki/feserver/src"
 )
 
-// default Server configuration file.
-const ConfigFile = "config.toml"
-
 // Configuration for server behavior.
 // it must construct by LoadConfig() or LoadConfigFile().
 type Config struct {
-	// server port
-	Port string
-
-	// server URL
-	URL string
+	// Http service address for the server.
+	HTTP string
 
 	// Source location for get questions.
 	Sources []Source
 }
 
 func (conf *Config) validates() error {
-	// check Port
-	if p := conf.Port; p == "" {
-		return fmt.Errorf("Config: empty Port, must be exist.")
-	}
-
 	// check sources
 	for _, s := range conf.Sources {
 		if err := s.Source.ValidatesSelf(); err != nil {
@@ -46,15 +35,13 @@ func (conf *Config) validates() error {
 }
 
 const (
-	DefaultURL  = "localhost"
-	DefaultPort = "8080"
+	DefaultHTTP = "localhost:8080"
 
 	DefaultWaitSecond = 2
 )
 
 var DefaultConfig = Config{
-	URL:  DefaultURL,
-	Port: DefaultPort,
+	HTTP: DefaultHTTP,
 	Sources: []Source{
 		DefaultSource,
 		FESource,
