@@ -1,17 +1,51 @@
+# cofiguration for the server settings and
+# source definition.
+
 HTTP       = "localhost:8080"  # http service address
 
-# F.E question definition.
+# root path serves F.E. quesiton.
 [[Sources]]
-  SubAddr    = "/fe"           # sub address in the API path. Must be uniqe.
-  WaitSecond = 3               # timeout limit for request.
+  # sub address in the API path. Must be uniqe.
+  SubAddr    = ""           
+  # timeout limit for request.
+  WaitSecond = 3               
 
   # URL template which accepts parameters Year, Season and No.
   URL = "http://www.fe-siken.com/kakomon/{{.Year}}_{{.Season}}/q{{.No}}.html"
-  MaxYear = 29                 # Maximum year limit.
-  MinYear = 13                 # Minimum year limit.
-  MaxNo = 80                   # Maximum quesiton number.
-  MinNo = 1                    # Mimimum quesiton number.
-  Season = "all"               # Season in which the examination is hold. [ "haru" | "aki" | "all" ]
+  # Maximum year limit.
+  MaxYear = 29         
+  # Minimum year limit.
+  MinYear = 13               
+  # Maximum quesiton number.
+  MaxNo = 80                 
+  # Mimimum quesiton number.
+  MinNo = 1                  
+  # Season in which the examination is hold. [ "haru" | "aki" | "all" ]
+  Season = "all"             
+
+# IT passport question definition.
+[[Sources]]
+  SubAddr    = "/ip"           
+  WaitSecond = 3               
+
+  URL = "http://www.itpassportsiken.com/kakomon/{{.Year}}_{{.Season}}/q{{.No}}.html"
+  MaxYear = 29                 
+  MinYear = 21                 
+  MaxNo = 100                  
+  MinNo = 1                    
+  Season = "all"               
+
+# F.E. question definition.
+[[Sources]]
+  SubAddr    = "/fe"           
+  WaitSecond = 3               
+
+  URL = "http://www.fe-siken.com/kakomon/{{.Year}}_{{.Season}}/q{{.No}}.html"
+  MaxYear = 29                 
+  MinYear = 13                 
+  MaxNo = 80                   
+  MinNo = 1                    
+  Season = "all"               
 
 # A.P. question definition.
 [[Sources]]
@@ -25,14 +59,86 @@ HTTP       = "localhost:8080"  # http service address
   MinNo = 1                  
   Season = "all"             
 
-# root path serves F.E. quesiton.
+# N.W.1. question definition.
 [[Sources]]
-  SubAddr    = ""           
+  SubAddr    = "/nw1"           
   WaitSecond = 3               
 
-  URL = "http://www.fe-siken.com/kakomon/{{.Year}}_{{.Season}}/q{{.No}}.html"
-  MaxYear = 29               
-  MinYear = 13               
-  MaxNo = 80                 
+  URL = "http://www.nw-siken.com/kakomon/{{.Year}}_{{.Season}}/am1_{{.No}}.html"
+  MaxYear = 29
+  MinYear = 21               
+  MaxNo = 30
   MinNo = 1                  
-  Season = "all"             
+  Season = "aki"             
+
+# N.W.2. question definition.
+[[Sources]]
+  SubAddr    = "/nw2"           
+  WaitSecond = 3               
+
+  URL = "http://www.nw-siken.com/kakomon/{{.Year}}_{{.Season}}/am2_{{.No}}.html"
+  MaxYear = 29
+  MinYear = 21               
+  MaxNo = 25
+  MinNo = 1                  
+  Season = "aki"             
+
+# D.B.1. question definition.
+[[Sources]]
+  SubAddr    = "/db1"           
+  WaitSecond = 3               
+
+  URL = "http://www.db-siken.com/kakomon/{{.Year}}_{{.Season}}/am1_{{.No}}.html"
+  MaxYear = 29
+  MinYear = 21               
+  MaxNo = 30
+  MinNo = 1                  
+  Season = "haru"             
+
+# D.B.2. question definition.
+[[Sources]]
+  SubAddr    = "/db2"           
+  WaitSecond = 3               
+
+  URL = "http://www.db-siken.com/kakomon/{{.Year}}_{{.Season}}/am2_{{.No}}.html"
+  MaxYear = 29
+  MinYear = 21               
+  MaxNo = 25
+  MinNo = 1                  
+  Season = "haru"             
+
+# P.M.1. question definition.
+[[Sources]]
+  SubAddr    = "/pm1"           
+  WaitSecond = 3               
+
+  URL = "http://www.pm-siken.com/kakomon/{{.Year}}_{{.Season}}/am1_{{.No}}.html"
+  MaxYear = 29
+  MinYear = 21               
+  MaxNo = 30
+  MinNo = 1                  
+  Season = "haru"             
+
+# P.M.2. question definition.
+[[Sources]]
+  SubAddr    = "/pm2"           
+  WaitSecond = 3               
+
+  URL = "http://www.pm-siken.com/kakomon/{{.Year}}_{{.Season}}/am2_{{.No}}.html"
+  MaxYear = 29
+  MinYear = 21               
+  MaxNo = 25
+  MinNo = 1                  
+  Season = "haru"             
+
+# S.M. question definition.
+[[Sources]]
+  SubAddr    = "/sm"           
+  WaitSecond = 3               
+  
+  URL = "http://www.sg-siken.com/kakomon/{{.Year}}_{{.Season}}/q{{.No}}.html"
+  MaxYear = 29
+  MinYear = 28               
+  MaxNo = 50
+  MinNo = 1                  
+  Season = "haru"             
