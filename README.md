@@ -1,11 +1,15 @@
 # feserver
+
 A server providing [F.E. examination](https://www.jitec.ipa.go.jp/1_11seido/fe.html) questions 
 which have been appeared in the past.
 The past questions are obtained from http://www.fe-siken.com.
 Thanks to the great Web site!
 
 feserver can also serve the questions from the other IPA examinations 
-such as [A.P.](https://www.jitec.ipa.go.jp/1_11seido/ap.html)!
+such as [A.P.](https://www.jitec.ipa.go.jp/1_11seido/ap.html) !
+
+**IMPORTANT : Please use feserver personally. Copyrights for the past questions are reserved by 
+http://www.fe-siken.com and [IPA](http://www.ipa.go.jp/index.html).**  
 
 ## Installation
 
