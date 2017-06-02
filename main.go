@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"go/build"
 	"log"
-	"os"
 	"path/filepath"
 
 	"github.com/mzki/feserver/server"
@@ -23,28 +22,34 @@ func init() {
 }
 
 func main() {
-	if confPath == "" {
-		// get the directory of the feserver repository under GOPATH.
-		// referenced from https://golang.org/x/tools/cmd/present/local.go.
-		p, err := build.Default.Import(pkgPath, "", build.FindOnly)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Couldn't find default config path: %v\n", err)
-			fmt.Fprintf(os.Stderr, confPathMessage, pkgPath)
-			os.Exit(1)
-		}
-		confPath = filepath.Join(p.Dir, defaultConfFile)
-	}
-
-	// load config file.
-	conf, err := server.LoadConfigFile(confPath)
+	conf, err := loadConfig(confPath)
 	if err != nil {
-		log.Fatalf("FATAL: Invalid config file: %v", err)
+		log.Println(err)
+		log.Println("\nCan not find any config path.\nuse builtin config insteadly")
+		conf = &server.DefaultConfig
 	}
 
 	// launch server process.
 	if err := server.ListenAndServe(conf); err != nil {
 		log.Fatalf("FATAL: %v", err)
 	}
+}
+
+func loadConfig(confPath string) (*server.Config, error) {
+	if confPath == "" {
+		// get the directory of the feserver repository under GOPATH.
+		// referenced from https://golang.org/x/tools/cmd/present/local.go.
+		p, err := build.Default.Import(pkgPath, "", build.FindOnly)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"Couldn't find default config path: %v\n"+confPathMessage,
+				err,
+				pkgPath,
+			)
+		}
+		confPath = filepath.Join(p.Dir, defaultConfFile)
+	}
+	return server.LoadConfigFile(confPath)
 }
 
 const confPathMessage = `
