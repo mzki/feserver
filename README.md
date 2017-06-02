@@ -56,6 +56,7 @@ The returned JSON response has:
 * `explanation`: Explanation for the Answer.
 * `hasImage`: question, selections, or answer contain some images. These might not be represented by only text.
 * `url`: Source URL in which the question is retrieved.
+* `version`: version for the json data structure.
 * `error`: Error message. Empty message indicates non-error.
 
 ## Configuration

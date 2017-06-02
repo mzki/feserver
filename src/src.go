@@ -29,7 +29,12 @@ type Response struct {
 	HasImage bool `json:"hasImage"`
 
 	URL string `json:"url"` // source URL
+
+	Version string `json:"version"` // version for json data structure
 }
+
+// current version for json data structure.
+const JSONVersion = "1.0.0"
 
 var defaultGetter = NewGetter(FE, LeastIntervalTime)
 
@@ -241,6 +246,7 @@ func parseDoc(doc *goquery.Document) (Response, error) {
 		Answer:      ansch_doc.Text(),
 		Explanation: ansbg_doc.Text(),
 		HasImage:    has_image,
+		Version:     JSONVersion,
 	}, nil
 }
 
